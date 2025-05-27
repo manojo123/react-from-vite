@@ -1,42 +1,40 @@
 import { Heart } from "lucide-react";
 import { ShortlistButton } from "./ShortlistButton";
-import { Dispatch, SetStateAction } from "react";
 import { Puppy } from "../types";
+import { Dispatch, SetStateAction } from "react";
 
 export function Shortlist({
     puppies,
-    liked,
-    setLiked
+    setPuppies
 }: {
     puppies: Puppy[],
-    liked: Puppy["id"][],
-    setLiked: Dispatch<SetStateAction<Puppy["id"][]>>
+    setPuppies: Dispatch<SetStateAction<Puppy[]>>
 }) {
     return (
-        < div >
+        <div>
             <h2 className="flex items-center gap-2 font-medium">
                 <span>Your shortlist</span>
                 <Heart className="fill-pink-500 stroke-pink-500" />
             </h2>
 
             <ul className="mt-4 flex flex-wrap gap-4">
-                {puppies.map(puppy => (
-                    liked.includes(puppy.id) && (
-                        <ShortListCard key={puppy.id} puppy={puppy} liked={liked} setLiked={setLiked} />
-                    )
-                ))}
+                {puppies
+                    .filter(puppy => puppy.likedBy.includes(1))
+                    .map(puppy => (
+                        <ShortListCard key={puppy.id} puppy={puppy} setPuppies={setPuppies} />
+                    ))}
             </ul>
         </div >
     )
 }
 
-type ShortListCardProps = {
+function ShortListCard({
+    puppy,
+    setPuppies
+}: {
     puppy: Puppy,
-    liked: Puppy["id"][],
-    setLiked: Dispatch<SetStateAction<Puppy["id"][]>>
-}
-
-function ShortListCard({ puppy, liked, setLiked }: ShortListCardProps) {
+    setPuppies: Dispatch<SetStateAction<Puppy[]>>
+}) {
     return (
         <li className="relative flex items-center overflow-clip rounded-md bg-white shadow-sm ring ring-black/5 transition duration-100 starting:scale-0 starting:opacity-0">
             <img
@@ -44,11 +42,11 @@ function ShortListCard({ puppy, liked, setLiked }: ShortListCardProps) {
                 width={32}
                 alt="Chase"
                 className="aspect-square w-8 object-cover"
-                src={puppy.imagePath}
+                src={puppy.imageUrl}
             />
             <p className="px-3 text-sm text-slate-800">{puppy.name}</p>
 
-            <ShortlistButton id={puppy.id} liked={liked} setLiked={setLiked} />
+            <ShortlistButton puppy={puppy} setPuppies={setPuppies} />
         </li>
     )
 }

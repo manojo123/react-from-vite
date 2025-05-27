@@ -1,34 +1,42 @@
-import { Heart } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Heart, LoaderCircle } from "lucide-react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Puppy } from "../types";
+import { toggleLikedStatus } from "../queries";
 
 export function LikeToggle({
-    id,
-    liked,
-    setLiked
+    puppy,
+    setPuppies
 }: {
-    id: Puppy["id"],
-    liked: Puppy["id"][],
-    setLiked: Dispatch<SetStateAction<Puppy["id"][]>>
+    puppy: Puppy,
+    setPuppies: Dispatch<SetStateAction<Puppy[]>>
 }) {
+    const [pending, setPending] = useState(false)
+
     return (
         <button
             className="group"
-            onClick={() => {
-                if (liked.includes(id)) {
-                    setLiked(liked.filter(pupId => pupId !== id))
-                } else {
-                    setLiked([...liked, id])
-                }
+            onClick={async () => {
+                setPending(true)
+                const updatedPuppy = await toggleLikedStatus(puppy.id)
+                setPuppies((prevPups) =>
+                    prevPups.map((existingPuppy) =>
+                        existingPuppy.id === updatedPuppy.id ? updatedPuppy : existingPuppy
+                    )
+                )
+
+                setPending(false)
             }}
         >
-            <Heart
-                className={
-                    liked.includes(id)
-                        ? "fill-pink-500 stroke-none"
-                        : "stroke-slate-200 group-hover:stroke-slate-300"
-                }
-            />
+            {pending
+                ? <LoaderCircle className="animate-spin stroke-slate-300" />
+                : <Heart
+                    className={
+                        puppy.likedBy.includes(1)
+                            ? "fill-pink-500 stroke-none"
+                            : "stroke-slate-200 group-hover:stroke-slate-300"
+                    }
+                />
+            }
         </button>
     )
 }
